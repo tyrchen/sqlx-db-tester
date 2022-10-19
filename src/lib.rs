@@ -109,13 +109,19 @@ impl Drop for TestDb {
     }
 }
 
+impl Default for TestDb {
+    fn default() -> Self {
+        Self::new("localhost", 5432, "postgres", "postgres", "./migrations")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[tokio::test]
     async fn test_db_should_create_and_drop() {
-        let tdb = TestDb::new("localhost", 5432, "postgres", "postgres", "./migrations");
+        let tdb = TestDb::default();
         let pool = tdb.get_pool().await;
         // insert todo
         sqlx::query("INSERT INTO todos (title) VALUES ('test')")
