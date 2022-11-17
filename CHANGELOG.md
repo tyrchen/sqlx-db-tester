@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1] - 2022-11-17
+
+[b30152a](b30152a9899f1f04199d337b457dcbaa2a102505)...[22fddc9](22fddc9fddf8267b36d82899ec029af4d28aa5ee)
+
+### Miscellaneous Tasks
+
+- Simplify sqlx features ([22fddc9](22fddc9fddf8267b36d82899ec029af4d28aa5ee) - 2022-11-17 by Tyr Chen)
+
 ## [0.2.0] - 2022-11-17
 
 ### Features
