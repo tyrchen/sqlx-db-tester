@@ -1,8 +1,13 @@
-use sqlx::{migrate::Migrator, Connection, Executor, PgConnection, PgPool};
+use sqlx::{
+    any::AnyPoolOptions,
+    migrate::{MigrationSource, Migrator},
+    AnyConnection, AnyPool, Connection, Executor,
+};
 use std::{path::Path, thread};
 use tokio::runtime::Runtime;
 use uuid::Uuid;
 
+#[derive(Debug)]
 pub struct TestDb {
     pub host: String,
     pub port: u16,
@@ -12,13 +17,16 @@ pub struct TestDb {
 }
 
 impl TestDb {
-    pub fn new(
+    pub fn new<S>(
         host: impl Into<String>,
         port: u16,
         user: impl Into<String>,
         password: impl Into<String>,
-        migration_path: impl Into<String>,
-    ) -> Self {
+        migrations: S,
+    ) -> Self
+    where
+        S: MigrationSource<'static> + Send + Sync + 'static,
+    {
         let host = host.into();
         let user = user.into();
         let password = password.into();
@@ -37,21 +45,20 @@ impl TestDb {
 
         let server_url = tdb.server_url();
         let url = tdb.url();
-        let migration_path = migration_path.into();
 
         // create database dbname
         thread::spawn(move || {
             let rt = Runtime::new().unwrap();
             rt.block_on(async move {
                 // use server url to create database
-                let mut conn = PgConnection::connect(&server_url).await.unwrap();
+                let mut conn = AnyConnection::connect(&server_url).await.unwrap();
                 conn.execute(format!(r#"CREATE DATABASE "{}""#, dbname_cloned).as_str())
                     .await
                     .unwrap();
 
                 // now connect to test database for migration
-                let mut conn = PgConnection::connect(&url).await.unwrap();
-                let m = Migrator::new(Path::new(&migration_path)).await.unwrap();
+                let mut conn = AnyConnection::connect(&url).await.unwrap();
+                let m = Migrator::new(migrations).await.unwrap();
                 m.run(&mut conn).await.unwrap();
             });
         })
@@ -76,8 +83,8 @@ impl TestDb {
         format!("{}/{}", self.server_url(), self.dbname)
     }
 
-    pub async fn get_pool(&self) -> PgPool {
-        sqlx::postgres::PgPoolOptions::new()
+    pub async fn get_pool(&self) -> AnyPool {
+        AnyPoolOptions::new()
             .max_connections(5)
             .connect(&self.url())
             .await
@@ -92,7 +99,7 @@ impl Drop for TestDb {
         thread::spawn(move || {
             let rt = Runtime::new().unwrap();
             rt.block_on(async move {
-                    let mut conn = PgConnection::connect(&server_url).await.unwrap();
+                    let mut conn = AnyConnection::connect(&server_url).await.unwrap();
                     // terminate existing connections
                     sqlx::query(&format!(r#"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = '{}'"#, dbname))
                     .execute(&mut conn)
@@ -111,7 +118,13 @@ impl Drop for TestDb {
 
 impl Default for TestDb {
     fn default() -> Self {
-        Self::new("localhost", 5432, "postgres", "postgres", "./migrations")
+        Self::new(
+            "localhost",
+            5432,
+            "postgres",
+            "postgres",
+            Path::new("./migrations"),
+        )
     }
 }
 
