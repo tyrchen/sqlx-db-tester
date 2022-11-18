@@ -2,11 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [0.3.0] - 2022-11-18
+
+[22fddc9](22fddc9fddf8267b36d82899ec029af4d28aa5ee)...[7f15d4a](7f15d4acf6ae02298d7a813dba065bc0d43b2f76)
 
 ### Miscellaneous Tasks
 
-- Roll code back to only support postgres ([acce036](acce0360bf4c95a7cf6dcb30509ba52d645ab6c2) - 2022-11-18 by Tyr Chen)
+- Roll code back to only support postgres ([7f15d4a](7f15d4acf6ae02298d7a813dba065bc0d43b2f76) - 2022-11-18 by Tyr Chen)
 
 ## [0.2.1] - 2022-11-17
 
