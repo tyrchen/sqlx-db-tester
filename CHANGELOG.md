@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2022-11-18
+
+[7f15d4a](7f15d4acf6ae02298d7a813dba065bc0d43b2f76)...[ab2f81f](ab2f81f126e70e942801b2f3251a9593ce3b5ccd)
+
+### Miscellaneous Tasks
+
+- Simplify the interface ([ab2f81f](ab2f81f126e70e942801b2f3251a9593ce3b5ccd) - 2022-11-18 by Tyr Chen)
+
 ## [0.3.0] - 2022-11-18
 
 [22fddc9](22fddc9fddf8267b36d82899ec029af4d28aa5ee)...[7f15d4a](7f15d4acf6ae02298d7a813dba065bc0d43b2f76)
