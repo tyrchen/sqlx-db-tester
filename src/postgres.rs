@@ -8,39 +8,20 @@ use uuid::Uuid;
 
 #[derive(Debug)]
 pub struct TestPg {
-    pub host: String,
-    pub port: u16,
-    pub user: String,
-    pub password: String,
+    pub server_url: String,
     pub dbname: String,
 }
 
 impl TestPg {
-    pub fn new<S>(
-        host: impl Into<String>,
-        port: u16,
-        user: impl Into<String>,
-        password: impl Into<String>,
-        migrations: S,
-    ) -> Self
+    pub fn new<S>(server_url: String, migrations: S) -> Self
     where
         S: MigrationSource<'static> + Send + Sync + 'static,
     {
-        let host = host.into();
-        let user = user.into();
-        let password = password.into();
-
         let uuid = Uuid::new_v4();
         let dbname = format!("test_{}", uuid);
         let dbname_cloned = dbname.clone();
 
-        let tdb = Self {
-            host,
-            port,
-            user,
-            password,
-            dbname,
-        };
+        let tdb = Self { server_url, dbname };
 
         let server_url = tdb.server_url();
         let url = tdb.url();
@@ -68,18 +49,11 @@ impl TestPg {
     }
 
     pub fn server_url(&self) -> String {
-        if self.password.is_empty() {
-            format!("postgres://{}@{}:{}", self.user, self.host, self.port)
-        } else {
-            format!(
-                "postgres://{}:{}@{}:{}",
-                self.user, self.password, self.host, self.port
-            )
-        }
+        self.server_url.clone()
     }
 
     pub fn url(&self) -> String {
-        format!("{}/{}", self.server_url(), self.dbname)
+        format!("{}/{}", self.server_url, self.dbname)
     }
 
     pub async fn get_pool(&self) -> PgPool {
@@ -113,10 +87,7 @@ impl Drop for TestPg {
 impl Default for TestPg {
     fn default() -> Self {
         Self::new(
-            "localhost",
-            5432,
-            "postgres",
-            "postgres",
+            "postgres://postgres:postgres@localhost:5432".to_string(),
             Path::new("./migrations"),
         )
     }
