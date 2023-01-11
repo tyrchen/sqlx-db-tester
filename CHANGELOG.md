@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.2] - 2023-01-11
+
+[ab2f81f](ab2f81f126e70e942801b2f3251a9593ce3b5ccd)...[ee78357](ee7835740f099b37908d9d9d2163d55cd17cf8b1)
+
+### Miscellaneous Tasks
+
+- Udpate deps and add Makefile ([ee78357](ee7835740f099b37908d9d9d2163d55cd17cf8b1) - 2023-01-11 by Tyr Chen)
+
 ## [0.3.1] - 2022-11-18
 
 [7f15d4a](7f15d4acf6ae02298d7a813dba065bc0d43b2f76)...[ab2f81f](ab2f81f126e70e942801b2f3251a9593ce3b5ccd)
