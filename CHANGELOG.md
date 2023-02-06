@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.3] - 2023-02-06
+
+[2774e93](2774e93464b971b97a9f1d1c97ea45903f4c2c9e)...[ab03c5d](ab03c5dc386afcb1d8bade5ec17a2c3f06e2c9d0)
+
+### Features
+
+- Support copy from csv ([ab03c5d](ab03c5dc386afcb1d8bade5ec17a2c3f06e2c9d0) - 2023-02-06 by Tyr Chen)
+
 ## [0.3.2] - 2023-01-11
 
 [ab2f81f](ab2f81f126e70e942801b2f3251a9593ce3b5ccd)...[2774e93](2774e93464b971b97a9f1d1c97ea45903f4c2c9e)
