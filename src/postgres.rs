@@ -1,3 +1,4 @@
+use anyhow::Result;
 use sqlx::{
     migrate::{MigrationSource, Migrator},
     Connection, Executor, PgConnection, PgPool,
@@ -18,7 +19,7 @@ impl TestPg {
         S: MigrationSource<'static> + Send + Sync + 'static,
     {
         let uuid = Uuid::new_v4();
-        let dbname = format!("test_{}", uuid);
+        let dbname = format!("test_{uuid}");
         let dbname_cloned = dbname.clone();
 
         let tdb = Self { server_url, dbname };
@@ -32,7 +33,7 @@ impl TestPg {
             rt.block_on(async move {
                 // use server url to create database
                 let mut conn = PgConnection::connect(&server_url).await.unwrap();
-                conn.execute(format!(r#"CREATE DATABASE "{}""#, dbname_cloned).as_str())
+                conn.execute(format!(r#"CREATE DATABASE "{dbname_cloned}""#).as_str())
                     .await
                     .unwrap();
 
@@ -59,6 +60,20 @@ impl TestPg {
     pub async fn get_pool(&self) -> PgPool {
         PgPool::connect(&self.url()).await.unwrap()
     }
+
+    pub async fn load_csv(&self, filename: &Path) -> Result<()> {
+        let pool = self.get_pool().await;
+        let path = filename.canonicalize()?;
+        let mut conn = pool.acquire().await?;
+        let sql = format!(
+            "COPY todos (id, title) FROM '{}' DELIMITER ',' CSV HEADER;",
+            path.display()
+        );
+        conn.execute(sql.as_str()).await?;
+        // copy csv
+
+        Ok(())
+    }
 }
 
 impl Drop for TestPg {
@@ -70,11 +85,11 @@ impl Drop for TestPg {
             rt.block_on(async move {
                     let mut conn = PgConnection::connect(&server_url).await.unwrap();
                     // terminate existing connections
-                    sqlx::query(&format!(r#"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = '{}'"#, dbname))
+                    sqlx::query(&format!(r#"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = '{dbname}'"#))
                     .execute( &mut conn)
                     .await
                     .expect("Terminate all other connections");
-                    conn.execute(format!(r#"DROP DATABASE "{}""#, dbname).as_str())
+                    conn.execute(format!(r#"DROP DATABASE "{dbname}""#).as_str())
                         .await
                         .expect("Error while querying the drop database");
                 });
@@ -88,14 +103,17 @@ impl Default for TestPg {
     fn default() -> Self {
         Self::new(
             "postgres://postgres:postgres@localhost:5432".to_string(),
-            Path::new("./migrations"),
+            Path::new("./fixtures/migrations"),
         )
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::path::Path;
+
     use crate::postgres::TestPg;
+    use anyhow::Result;
 
     #[tokio::test]
     async fn test_postgres_should_create_and_drop() {
@@ -113,5 +131,21 @@ mod tests {
             .unwrap();
         assert_eq!(id, 1);
         assert_eq!(title, "test");
+    }
+
+    #[tokio::test]
+    async fn test_postgres_should_load_csv() -> Result<()> {
+        let filename = Path::new("./fixtures/todos.csv");
+        let tdb = TestPg::default();
+        tdb.load_csv(filename).await?;
+        let pool = tdb.get_pool().await;
+        // get todo
+        let (id, title) = sqlx::query_as::<_, (i32, String)>("SELECT id, title FROM todos")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(id, 1);
+        assert_eq!(title, "hello world");
+        Ok(())
     }
 }
