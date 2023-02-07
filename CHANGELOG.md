@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.4] - 2023-02-07
+
+[ab03c5d](ab03c5dc386afcb1d8bade5ec17a2c3f06e2c9d0)...[72a2ba9](72a2ba9b54006d28c914d2117bfb0799ba9ba64f)
+
+### Bug Fixes
+
+- More flexible interface for load_csv ([72a2ba9](72a2ba9b54006d28c914d2117bfb0799ba9ba64f) - 2023-02-07 by Tyr Chen)
+
 ## [0.3.3] - 2023-02-06
 
 [2774e93](2774e93464b971b97a9f1d1c97ea45903f4c2c9e)...[ab03c5d](ab03c5dc386afcb1d8bade5ec17a2c3f06e2c9d0)
