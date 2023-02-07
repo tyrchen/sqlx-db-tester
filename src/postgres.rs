@@ -61,12 +61,13 @@ impl TestPg {
         PgPool::connect(&self.url()).await.unwrap()
     }
 
-    pub async fn load_csv(&self, filename: &Path) -> Result<()> {
+    pub async fn load_csv(&self, fields: &[&str], filename: &Path) -> Result<()> {
         let pool = self.get_pool().await;
         let path = filename.canonicalize()?;
         let mut conn = pool.acquire().await?;
         let sql = format!(
-            "COPY todos (id, title) FROM '{}' DELIMITER ',' CSV HEADER;",
+            "COPY todos ({}) FROM '{}' DELIMITER ',' CSV HEADER;",
+            fields.join(","),
             path.display()
         );
         conn.execute(sql.as_str()).await?;
@@ -137,7 +138,7 @@ mod tests {
     async fn test_postgres_should_load_csv() -> Result<()> {
         let filename = Path::new("./fixtures/todos.csv");
         let tdb = TestPg::default();
-        tdb.load_csv(filename).await?;
+        tdb.load_csv(&["title"], filename).await?;
         let pool = tdb.get_pool().await;
         // get todo
         let (id, title) = sqlx::query_as::<_, (i32, String)>("SELECT id, title FROM todos")
