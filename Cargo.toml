@@ -1,6 +1,6 @@
 [package]
 name = "sqlx-db-tester"
-version = "0.3.4"
+version = "0.3.5"
 authors = ["Tyr Chen <tyr.chen@gmail.com>"]
 edition = "2021"
 license = "MIT"
@@ -15,6 +15,8 @@ keywords = ["sqlx", "postgres", "database", "test"]
 
 [dependencies]
 anyhow = "1.0.69"
+csv = "1.1.6"
+itertools = "0.10.5"
 sqlx = { version = "0.6.2", features = ["runtime-tokio-rustls", "postgres"] }
 tokio = { version = "1.24.1", features = ["macros", "rt", "rt-multi-thread"] }
 uuid = { version = "1.2.2", features = ["v4"] }

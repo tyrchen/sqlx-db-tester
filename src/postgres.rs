@@ -1,4 +1,5 @@
 use anyhow::Result;
+use itertools::Itertools;
 use sqlx::{
     migrate::{MigrationSource, Migrator},
     Connection, Executor, PgConnection, PgPool,
@@ -61,18 +62,37 @@ impl TestPg {
         PgPool::connect(&self.url()).await.unwrap()
     }
 
-    pub async fn load_csv(&self, fields: &[&str], filename: &Path) -> Result<()> {
+    pub async fn load_csv(&self, table: &str, fields: &[&str], filename: &Path) -> Result<()> {
         let pool = self.get_pool().await;
         let path = filename.canonicalize()?;
         let mut conn = pool.acquire().await?;
         let sql = format!(
-            "COPY todos ({}) FROM '{}' DELIMITER ',' CSV HEADER;",
+            "COPY {} ({}) FROM '{}' DELIMITER ',' CSV HEADER;",
+            table,
             fields.join(","),
             path.display()
         );
         conn.execute(sql.as_str()).await?;
         // copy csv
 
+        Ok(())
+    }
+
+    pub async fn load_csv_data(&self, table: &str, csv: &str) -> Result<()> {
+        let mut rdr = csv::Reader::from_reader(csv.as_bytes());
+        let headers = rdr.headers()?.iter().join(",");
+        let mut tx = self.get_pool().await.begin().await?;
+        for result in rdr.records() {
+            let record = result?;
+            let sql = format!(
+                "INSERT INTO {} ({}) VALUES ({})",
+                table,
+                headers,
+                record.iter().map(|v| format!("'{v}'")).join(",")
+            );
+            tx.execute(sql.as_str()).await?;
+        }
+        tx.commit().await?;
         Ok(())
     }
 }
@@ -138,7 +158,23 @@ mod tests {
     async fn test_postgres_should_load_csv() -> Result<()> {
         let filename = Path::new("./fixtures/todos.csv");
         let tdb = TestPg::default();
-        tdb.load_csv(&["title"], filename).await?;
+        tdb.load_csv("todos", &["title"], filename).await?;
+        let pool = tdb.get_pool().await;
+        // get todo
+        let (id, title) = sqlx::query_as::<_, (i32, String)>("SELECT id, title FROM todos")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(id, 1);
+        assert_eq!(title, "hello world");
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_postgres_should_load_csv_data() -> Result<()> {
+        let csv = include_str!("../fixtures/todos.csv");
+        let tdb = TestPg::default();
+        tdb.load_csv_data("todos", csv).await?;
         let pool = tdb.get_pool().await;
         // get todo
         let (id, title) = sqlx::query_as::<_, (i32, String)>("SELECT id, title FROM todos")
