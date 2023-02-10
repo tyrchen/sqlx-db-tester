@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.5] - 2023-02-10
+
+[72a2ba9](72a2ba9b54006d28c914d2117bfb0799ba9ba64f)...[1290868](1290868db99dc771500245cb1e6c3149bcc95813)
+
+### Features
+
+- Support to load csv data ([1290868](1290868db99dc771500245cb1e6c3149bcc95813) - 2023-02-10 by Tyr Chen)
+
 ## [0.3.4] - 2023-02-07
 
 [ab03c5d](ab03c5dc386afcb1d8bade5ec17a2c3f06e2c9d0)...[72a2ba9](72a2ba9b54006d28c914d2117bfb0799ba9ba64f)
