@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.6] - 2023-02-14
+
+[1290868](1290868db99dc771500245cb1e6c3149bcc95813)...[57ad45c](57ad45c51b16406fd15f34ed6330679fb6bcee74)
+
+### Miscellaneous Tasks
+
+- Update deps ([57ad45c](57ad45c51b16406fd15f34ed6330679fb6bcee74) - 2023-02-14 by Tyr Chen)
+
 ## [0.3.5] - 2023-02-10
 
 [72a2ba9](72a2ba9b54006d28c914d2117bfb0799ba9ba64f)...[1290868](1290868db99dc771500245cb1e6c3149bcc95813)
