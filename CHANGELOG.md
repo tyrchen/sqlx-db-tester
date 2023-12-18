@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file. See [conven
 ---
 ## [0.4.0](https://github.com/tyrchen/sqlx-db-tester/compare/v0.3.6..v0.4.0) - 2023-12-18
 
+### Bug Fixes
+
+- gh action - ([870e9fe](https://github.com/tyrchen/sqlx-db-tester/commit/870e9fed0076bd0c21b427eb183e55cbc586eff4)) - Tyr Chen
+
 ### Miscellaneous Chores
 
 - update dependencies - ([6969947](https://github.com/tyrchen/sqlx-db-tester/commit/69699474532baa756ba5bbd0bd359857c6cce9e3)) - Tyr Chen
@@ -12,6 +16,7 @@ All notable changes to this project will be documented in this file. See [conven
 ### Other
 
 - Update CHANGELOG.md - ([22733a6](https://github.com/tyrchen/sqlx-db-tester/commit/22733a61e1d154e0e17b2a9d2cd622ac3165ba38)) - Tyr Chen
+- Update CHANGELOG.md - ([c67f83d](https://github.com/tyrchen/sqlx-db-tester/commit/c67f83da53cb928a3b2f9d5e87c66af2ff09a9a5)) - Tyr Chen
 
 ---
 ## [0.3.6](https://github.com/tyrchen/sqlx-db-tester/compare/v0.3.5..v0.3.6) - 2023-02-14
