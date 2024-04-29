@@ -39,7 +39,9 @@ impl TestPg {
                     .unwrap();
 
                 // now connect to test database for migration
-                let mut conn = PgConnection::connect(&url).await.unwrap();
+                let mut conn = PgConnection::connect(&url)
+                    .await
+                    .unwrap_or_else(|_| panic!("Error while connecting to {}", server_url));
                 let m = Migrator::new(migrations).await.unwrap();
                 m.run(&mut conn).await.unwrap();
             });
@@ -59,7 +61,10 @@ impl TestPg {
     }
 
     pub async fn get_pool(&self) -> PgPool {
-        PgPool::connect(&self.url()).await.unwrap()
+        let url = self.url();
+        PgPool::connect(&url)
+            .await
+            .unwrap_or_else(|_| panic!("Error while connecting to {}", url))
     }
 
     pub async fn load_csv(&self, table: &str, fields: &[&str], filename: &Path) -> Result<()> {
@@ -104,7 +109,9 @@ impl Drop for TestPg {
         thread::spawn(move || {
             let rt = Runtime::new().unwrap();
             rt.block_on(async move {
-                    let mut conn = PgConnection::connect(&server_url).await.unwrap();
+                    let mut conn = PgConnection::connect(&server_url).await
+                    .unwrap_or_else(|_| panic!("Error while connecting to {}", server_url))
+                    ;
                     // terminate existing connections
                     sqlx::query(&format!(r#"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = '{dbname}'"#))
                     .execute( &mut conn)
