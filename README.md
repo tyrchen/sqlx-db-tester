@@ -27,4 +27,4 @@ This project is distributed under the terms of MIT.
 
 See [LICENSE](LICENSE.md) for details.
 
-Copyright 2022 Tyr Chen
+Copyright 2022-2024 Tyr Chen
