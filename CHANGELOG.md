@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 ---
+## [0.4.1](https://github.com/tyrchen/sqlx-db-tester/compare/v0.4.0..v0.4.1) - 2024-04-29
+
+### Miscellaneous Chores
+
+- trigger gh action again - ([1a6f82a](https://github.com/tyrchen/sqlx-db-tester/commit/1a6f82a7ad0866c0ab1a486bf013d5040c1a56e3)) - Tyr Chen
+- panic with proper message - ([e0dedfd](https://github.com/tyrchen/sqlx-db-tester/commit/e0dedfdaed610b9ae2c83c69f612ceed5c511801)) - Tyr Chen
+
+### Other
+
+- Update CHANGELOG.md - ([5dc1868](https://github.com/tyrchen/sqlx-db-tester/commit/5dc18687c9b394bb35ba73316f7ed2e2db884ef9)) - Tyr Chen
+
+---
 ## [0.4.0](https://github.com/tyrchen/sqlx-db-tester/compare/v0.3.6..v0.4.0) - 2023-12-18
 
 ### Bug Fixes
