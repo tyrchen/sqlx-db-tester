@@ -33,7 +33,9 @@ impl TestPg {
             let rt = Runtime::new().unwrap();
             rt.block_on(async move {
                 // use server url to create database
-                let mut conn = PgConnection::connect(&server_url).await.unwrap();
+                let mut conn = PgConnection::connect(&server_url)
+                    .await
+                    .unwrap_or_else(|_| panic!("Error while connecting to {}", server_url));
                 conn.execute(format!(r#"CREATE DATABASE "{dbname_cloned}""#).as_str())
                     .await
                     .unwrap();
