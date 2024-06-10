@@ -109,7 +109,8 @@ impl TestPg {
 
 impl Drop for TestPg {
     fn drop(&mut self) {
-        let database_url = self.url();
+        let server_url = &self.server_url;
+        let database_url = format!("{server_url}/postgres");
         let dbname = self.dbname.clone();
         thread::spawn(move || {
             let rt = Runtime::new().unwrap();
