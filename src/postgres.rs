@@ -15,17 +15,20 @@ pub struct TestPg {
 }
 
 impl TestPg {
-    pub fn new<S>(server_url: String, migrations: S) -> Self
+    pub fn new<S>(database_url: String, migrations: S) -> Self
     where
         S: MigrationSource<'static> + Send + Sync + 'static,
     {
         let uuid = Uuid::new_v4();
-        let dbname = format!("test_{uuid}");
+        let (server_url, dbname) = parse_postgres_url(&database_url);
+        let dbname = match dbname {
+            Some(db_name) => format!("{}_test_{}", db_name, uuid),
+            None => format!("test_{}", uuid),
+        };
         let dbname_cloned = dbname.clone();
 
         let tdb = Self { server_url, dbname };
 
-        let server_url = tdb.server_url();
         let url = tdb.url();
 
         // create database dbname
@@ -33,9 +36,9 @@ impl TestPg {
             let rt = Runtime::new().unwrap();
             rt.block_on(async move {
                 // use server url to create database
-                let mut conn = PgConnection::connect(&server_url)
+                let mut conn = PgConnection::connect(&database_url)
                     .await
-                    .unwrap_or_else(|_| panic!("Error while connecting to {}", server_url));
+                    .unwrap_or_else(|_| panic!("Error while connecting to {}", database_url));
                 conn.execute(format!(r#"CREATE DATABASE "{dbname_cloned}""#).as_str())
                     .await
                     .unwrap();
@@ -43,7 +46,7 @@ impl TestPg {
                 // now connect to test database for migration
                 let mut conn = PgConnection::connect(&url)
                     .await
-                    .unwrap_or_else(|_| panic!("Error while connecting to {}", server_url));
+                    .unwrap_or_else(|_| panic!("Error while connecting to {}", &url));
                 let m = Migrator::new(migrations).await.unwrap();
                 m.run(&mut conn).await.unwrap();
             });
@@ -106,14 +109,14 @@ impl TestPg {
 
 impl Drop for TestPg {
     fn drop(&mut self) {
-        let server_url = self.server_url();
+        let server_url = &self.server_url;
+        let database_url = format!("{server_url}/postgres");
         let dbname = self.dbname.clone();
         thread::spawn(move || {
             let rt = Runtime::new().unwrap();
             rt.block_on(async move {
-                    let mut conn = PgConnection::connect(&server_url).await
-                    .unwrap_or_else(|_| panic!("Error while connecting to {}", server_url))
-                    ;
+                    let mut conn = PgConnection::connect(&database_url).await
+                    .unwrap_or_else(|_| panic!("Error while connecting to {}", database_url));
                     // terminate existing connections
                     sqlx::query(&format!(r#"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = '{dbname}'"#))
                     .execute( &mut conn)
@@ -138,6 +141,20 @@ impl Default for TestPg {
     }
 }
 
+fn parse_postgres_url(url: &str) -> (String, Option<String>) {
+    let url_without_protocol = url.trim_start_matches("postgres://");
+
+    let parts: Vec<&str> = url_without_protocol.split('/').collect();
+    let server_url = format!("postgres://{}", parts[0]);
+
+    let dbname = if parts.len() > 1 && !parts[1].is_empty() {
+        Some(parts[1].to_string())
+    } else {
+        None
+    };
+
+    (server_url, dbname)
+}
 #[cfg(test)]
 mod tests {
     use std::env;
@@ -195,5 +212,21 @@ mod tests {
         assert_eq!(id, 1);
         assert_eq!(title, "hello world");
         Ok(())
+    }
+    use super::*;
+    #[test]
+    fn test_with_dbname() {
+        let url = "postgres://testuser:1@localhost/pureya";
+        let (server_url, dbname) = parse_postgres_url(url);
+        assert_eq!(server_url, "postgres://testuser:1@localhost");
+        assert_eq!(dbname, Some("pureya".to_string()));
+    }
+
+    #[test]
+    fn test_without_dbname() {
+        let url = "postgres://testuser:1@localhost";
+        let (server_url, dbname) = parse_postgres_url(url);
+        assert_eq!(server_url, "postgres://testuser:1@localhost");
+        assert_eq!(dbname, None);
     }
 }
