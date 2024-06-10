@@ -145,7 +145,7 @@ fn parse_postgres_url(url: &str) -> (String, Option<String>) {
     let url_without_protocol = url.trim_start_matches("postgres://");
 
     let parts: Vec<&str> = url_without_protocol.split('/').collect();
-    let server_url = parts[0].to_string();
+    let server_url = format!("postgres://{}", parts[0]);
 
     let dbname = if parts.len() > 1 && !parts[1].is_empty() {
         Some(parts[1].to_string())
@@ -155,7 +155,6 @@ fn parse_postgres_url(url: &str) -> (String, Option<String>) {
 
     (server_url, dbname)
 }
-
 #[cfg(test)]
 mod tests {
     use std::env;
@@ -217,17 +216,17 @@ mod tests {
     use super::*;
     #[test]
     fn test_with_dbname() {
-        let url = "postgres://liufankai:1@localhost/pureya";
+        let url = "postgres://testuser:1@localhost/pureya";
         let (server_url, dbname) = parse_postgres_url(url);
-        assert_eq!(server_url, "liufankai:1@localhost");
+        assert_eq!(server_url, "postgres://testuser:1@localhost");
         assert_eq!(dbname, Some("pureya".to_string()));
     }
 
     #[test]
     fn test_without_dbname() {
-        let url = "postgres://liufankai:1@localhost";
+        let url = "postgres://testuser:1@localhost";
         let (server_url, dbname) = parse_postgres_url(url);
-        assert_eq!(server_url, "liufankai:1@localhost");
+        assert_eq!(server_url, "postgres://testuser:1@localhost");
         assert_eq!(dbname, None);
     }
 }
