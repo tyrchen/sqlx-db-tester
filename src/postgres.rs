@@ -109,14 +109,13 @@ impl TestPg {
 
 impl Drop for TestPg {
     fn drop(&mut self) {
-        let server_url = self.server_url();
+        let database_url = self.url();
         let dbname = self.dbname.clone();
         thread::spawn(move || {
             let rt = Runtime::new().unwrap();
             rt.block_on(async move {
-                    let mut conn = PgConnection::connect(&server_url).await
-                    .unwrap_or_else(|_| panic!("Error while connecting to {}", server_url))
-                    ;
+                    let mut conn = PgConnection::connect(&database_url).await
+                    .unwrap_or_else(|_| panic!("Error while connecting to {}", database_url));
                     // terminate existing connections
                     sqlx::query(&format!(r#"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = '{dbname}'"#))
                     .execute( &mut conn)
