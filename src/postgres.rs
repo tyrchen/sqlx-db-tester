@@ -15,12 +15,12 @@ pub struct TestPg {
 }
 
 impl TestPg {
-    pub fn new<S>(server_url: String, migrations: S) -> Self
+    pub fn new<S>(database_url: String, migrations: S) -> Self
     where
         S: MigrationSource<'static> + Send + Sync + 'static,
     {
         let uuid = Uuid::new_v4();
-        let (server_url, dbname) = parse_postgres_url(&server_url);
+        let (server_url, dbname) = parse_postgres_url(&database_url);
         let dbname = match dbname {
             Some(db_name) => format!("{}_test_{}", db_name, uuid),
             None => format!("test_{}", uuid),
@@ -29,7 +29,6 @@ impl TestPg {
 
         let tdb = Self { server_url, dbname };
 
-        let server_url = tdb.server_url();
         let url = tdb.url();
 
         // create database dbname
@@ -37,9 +36,9 @@ impl TestPg {
             let rt = Runtime::new().unwrap();
             rt.block_on(async move {
                 // use server url to create database
-                let mut conn = PgConnection::connect(&server_url)
+                let mut conn = PgConnection::connect(&database_url)
                     .await
-                    .unwrap_or_else(|_| panic!("Error while connecting to {}", server_url));
+                    .unwrap_or_else(|_| panic!("Error while connecting to {}", database_url));
                 conn.execute(format!(r#"CREATE DATABASE "{dbname_cloned}""#).as_str())
                     .await
                     .unwrap();
