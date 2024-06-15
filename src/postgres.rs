@@ -20,7 +20,8 @@ impl TestPg {
         S: MigrationSource<'static> + Send + Sync + 'static,
     {
         let uuid = Uuid::new_v4();
-        let dbname = format!("test_{uuid}");
+        let simple = uuid.simple();
+        let dbname = format!("test_{}", simple);
         let dbname_cloned = dbname.clone();
 
         let tdb = Self { server_url, dbname };
