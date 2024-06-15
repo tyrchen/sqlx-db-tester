@@ -31,7 +31,8 @@ impl TestMysql {
         let password = password.into();
 
         let uuid = Uuid::new_v4();
-        let dbname = format!("test_{}", uuid);
+        let simple = uuid.simple();
+        let dbname = format!("test_{}", simple);
         let dbname_cloned = dbname.clone();
 
         let tdb = Self {
