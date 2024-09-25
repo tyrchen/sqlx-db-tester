@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 ---
+## [0.5.0](https://github.com/tyrchen/sqlx-db-tester/compare/v0.4.2..v0.5.0) - 2024-09-25
+
+### Bug Fixes
+
+- fix merge issue and bump version to 0.5 - ([84163ee](https://github.com/tyrchen/sqlx-db-tester/commit/84163eee7ffc6d0f0421e54c0c29070b08a37206)) - Tyr Chen
+
+### Other
+
+- Update CHANGELOG.md - ([1c19b92](https://github.com/tyrchen/sqlx-db-tester/commit/1c19b92f702d3a3cd53c175b85ad4fa0feff75bd)) - Tyr Chen
+- keep readme up-to-date (#2) - ([6b75b7b](https://github.com/tyrchen/sqlx-db-tester/commit/6b75b7bd1cdf831ab100901fd4a3f628fb4c3e06)) - hairtail
+- Enhance PostgreSQL URL Parsing to Support Optional Database Names (#3)
+
+* feature: support databse_url with database name
+
+* fix: fix connect error
+
+* fix: fix parse postgres url
+
+* fix: fix drop error
+
+* fix: "cannot drop the currently open database"
+
+* update:sqlx version
+
+---------
+
+Co-authored-by: Tyr Chen <tyr.chen@gmail.com> - ([d53708d](https://github.com/tyrchen/sqlx-db-tester/commit/d53708de112255c8bfa6562dae1907e378f99f8d)) - fankaiLiu
+
+### Refactoring
+
+- remove hyphen in test dbname (#4) - ([31e0ef0](https://github.com/tyrchen/sqlx-db-tester/commit/31e0ef05c632178096c9f0fe19830f17e26f386c)) - Daniel Liu
+
+---
 ## [0.4.2](https://github.com/tyrchen/sqlx-db-tester/compare/v0.4.1..v0.4.2) - 2024-04-29
 
 ### Miscellaneous Chores
