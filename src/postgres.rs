@@ -6,6 +6,7 @@ use sqlx::{
 };
 use std::{path::Path, thread};
 use tokio::runtime::Runtime;
+use uuid::Uuid;
 
 #[derive(Debug)]
 pub struct TestPg {
@@ -18,7 +19,7 @@ impl TestPg {
     where
         S: MigrationSource<'static> + Send + Sync + 'static,
     {
-        let simple = uuid.simple();
+        let simple = Uuid::new_v4().simple();
         let (server_url, dbname) = parse_postgres_url(&database_url);
         let dbname = match dbname {
             Some(db_name) => format!("{}_test_{}", db_name, simple),
