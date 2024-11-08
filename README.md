@@ -14,7 +14,7 @@ fn some_awesom_test() {
     let tdb = TestPg::new(
             "postgres://postgres:postgres@localhost:5432".to_string(),
             std::path::Path::new("./migrations"),
-        )
+        );
     let pool = tdb.get_pool().await;
     // do something with the pool
 
