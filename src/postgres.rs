@@ -1,8 +1,8 @@
 use anyhow::Result;
 use itertools::Itertools;
 use sqlx::{
-    migrate::{MigrationSource, Migrator},
     Connection, Executor, PgConnection, PgPool,
+    migrate::{MigrationSource, Migrator},
 };
 use std::{path::Path, thread};
 use tokio::runtime::Runtime;
