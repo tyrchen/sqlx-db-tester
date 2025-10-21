@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 ---
+## [0.6.1](https://github.com/tyrchen/sqlx-db-tester/compare/v0.6.0..v0.6.1) - 2025-10-21
+
+### Features
+
+- Add comprehensive MySQL support matching PostgreSQL implementation - ([2558f10](https://github.com/tyrchen/sqlx-db-tester/commit/2558f108aa86d631de476ddac6db5cf9bf31d576)) - Tyr Chen
+
+### Miscellaneous Chores
+
+- update deps - ([b750786](https://github.com/tyrchen/sqlx-db-tester/commit/b750786e668d44f5aa792eae341a91a341b452da)) - Tyr Chen
+
+---
+## [0.6.0](https://github.com/tyrchen/sqlx-db-tester/compare/v0.5.0..v0.6.0) - 2025-03-30
+
+### Miscellaneous Chores
+
+- upgrade to rust 2024 - ([6ccdb5c](https://github.com/tyrchen/sqlx-db-tester/commit/6ccdb5ce04372a3cf67a72468be8b21ce02d10dc)) - Tyr Chen
+- fix gh - ([2cb4f6d](https://github.com/tyrchen/sqlx-db-tester/commit/2cb4f6d3ea4d65808618ce210a1a88800ab412e8)) - Tyr Chen
+
+### Other
+
+- Update CHANGELOG.md - ([ae8deea](https://github.com/tyrchen/sqlx-db-tester/commit/ae8deea4155e8f4943a01f72b724a470f7026e33)) - Tyr Chen
+
+---
 ## [0.5.0](https://github.com/tyrchen/sqlx-db-tester/compare/v0.4.2..v0.5.0) - 2024-09-25
 
 ### Bug Fixes
