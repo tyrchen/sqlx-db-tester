@@ -1,4 +1,4 @@
-#![cfg(feature = "mysql")]
+#[cfg(feature = "mysql")]
 mod mysql;
 #[cfg(feature = "postgres")]
 mod postgres;
