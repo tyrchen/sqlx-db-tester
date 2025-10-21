@@ -3,15 +3,47 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 ---
-## [0.6.1](https://github.com/tyrchen/sqlx-db-tester/compare/v0.6.0..v0.6.1) - 2025-10-21
-
-### Features
-
-- Add comprehensive MySQL support matching PostgreSQL implementation - ([2558f10](https://github.com/tyrchen/sqlx-db-tester/commit/2558f108aa86d631de476ddac6db5cf9bf31d576)) - Tyr Chen
+## [0.6.2](https://github.com/tyrchen/sqlx-db-tester/compare/v0.6.0..v0.6.2) - 2025-10-21
 
 ### Miscellaneous Chores
 
-- update deps - ([b750786](https://github.com/tyrchen/sqlx-db-tester/commit/b750786e668d44f5aa792eae341a91a341b452da)) - Tyr Chen
+- update github action - ([d213020](https://github.com/tyrchen/sqlx-db-tester/commit/d213020b3fc71f49af10553aeb1be4b5fadbec3f)) - Tyr Chen
+- add features to exclude mysql - ([0d4ffdc](https://github.com/tyrchen/sqlx-db-tester/commit/0d4ffdcf80c05b6c4b96a6b5d1da4665d2570710)) - Tyr Chen
+- ignore failing test in github action due to no direct file access - ([be54eec](https://github.com/tyrchen/sqlx-db-tester/commit/be54eec1282ddb17db47cb7344987abffcaf7cab)) - Tyr Chen
+
+### Other
+
+- Feature/support mysql (#8)
+
+* feat: Add comprehensive MySQL support matching PostgreSQL implementation
+
+- Implement TestMySql struct with automatic database lifecycle management
+- Add database creation/deletion with unique UUID-based names
+- Support connection pooling via get_pool() method
+- Implement CSV loading functionality (load_csv and load_csv_data)
+- Add MySQL-specific URL parsing for flexible connection strings
+- Include Docker/Podman setup in Makefile with MySQL 8.0 support
+- Configure MySQL to run on port 3307 to avoid conflicts
+- Use mysql_native_password for compatibility
+- Add MySQL service to GitHub Actions workflow for CI/CD
+- Create example demonstrating MySQL usage
+- Add MySQL-specific migrations for testing
+- Update package metadata to reflect MySQL support
+
+The implementation provides feature parity with PostgreSQL, enabling
+seamless integration testing with automatic database management.
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+
+* chore: update deps
+
+* Update CHANGELOG.md
+
+---------
+
+Co-authored-by: Claude <noreply@anthropic.com> - ([a0a2d64](https://github.com/tyrchen/sqlx-db-tester/commit/a0a2d64ca9bc62025a6c11c3849ffaa9e0fc84e0)) - Tyr Chen
 
 ---
 ## [0.6.0](https://github.com/tyrchen/sqlx-db-tester/compare/v0.5.0..v0.6.0) - 2025-03-30
