@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 ---
+## [0.6.3](https://github.com/tyrchen/sqlx-db-tester/compare/v0.6.2..v0.6.3) - 2025-10-21
+
+### Miscellaneous Chores
+
+- fix sqlx deps - ([94ad064](https://github.com/tyrchen/sqlx-db-tester/commit/94ad064f72c8f00f72a7f774570f365525c7b828)) - Tyr Chen
+
+### Other
+
+- Update CHANGELOG.md - ([b167467](https://github.com/tyrchen/sqlx-db-tester/commit/b167467563dbfff32dc5deaf0475f156de741831)) - Tyr Chen
+
+---
 ## [0.6.2](https://github.com/tyrchen/sqlx-db-tester/compare/v0.6.0..v0.6.2) - 2025-10-21
 
 ### Miscellaneous Chores
