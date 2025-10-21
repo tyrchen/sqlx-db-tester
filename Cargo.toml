@@ -13,6 +13,11 @@ readme = "README.md"
 categories = ["development-tools"]
 keywords = ["sqlx", "postgres", "mysql", "database", "test"]
 
+[features]
+default = ["postgres"]
+postgres = ["sqlx/postgres"]
+mysql = ["sqlx/mysql"]
+
 [dependencies]
 anyhow = "1"
 csv = "1.4"
