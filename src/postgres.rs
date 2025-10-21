@@ -181,6 +181,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[ignore = "github action postgres server can't be used for this test"]
     async fn test_postgres_should_load_csv() -> Result<()> {
         let filename = env::current_dir()?.join("fixtures/todos.csv");
         let tdb = TestPg::default();
