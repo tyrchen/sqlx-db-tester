@@ -154,6 +154,7 @@ mod tests {
     use anyhow::Result;
 
     #[tokio::test]
+    #[ignore = "requires MySQL server running on 127.0.0.1:3307"]
     async fn test_mysql_should_create_and_drop() {
         let tdb = TestMySql::default();
         let pool = tdb.get_pool().await;
@@ -172,6 +173,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[ignore = "requires MySQL server running on 127.0.0.1:3307"]
     async fn test_mysql_should_load_csv() -> Result<()> {
         let filename = env::current_dir()?.join("fixtures/todos.csv");
         let tdb = TestMySql::default();
@@ -188,6 +190,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[ignore = "requires MySQL server running on 127.0.0.1:3307"]
     async fn test_mysql_should_load_csv_data() -> Result<()> {
         let csv = include_str!("../fixtures/todos.csv");
         let tdb = TestMySql::default();
