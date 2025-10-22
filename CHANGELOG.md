@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 ---
+## [0.7.0](https://github.com/tyrchen/sqlx-db-tester/compare/v0.6.4..v0.7.0) - 2025-10-22
+
+### Features
+
+- allow to add ext for pg - ([3cc1d55](https://github.com/tyrchen/sqlx-db-tester/commit/3cc1d5577ffc5bb63ca0720fd834846e5d0b3c3a)) - Tyr Chen
+
+### Other
+
+- Update CHANGELOG.md - ([c36e45a](https://github.com/tyrchen/sqlx-db-tester/commit/c36e45a89095e37f942eb7887517110d6efb397e)) - Tyr Chen
+
+---
 ## [0.6.4](https://github.com/tyrchen/sqlx-db-tester/compare/v0.6.3..v0.6.4) - 2025-10-21
 
 ### Miscellaneous Chores
