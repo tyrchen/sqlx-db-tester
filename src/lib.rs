@@ -6,4 +6,4 @@ mod postgres;
 #[cfg(feature = "mysql")]
 pub use mysql::TestMySql;
 #[cfg(feature = "postgres")]
-pub use postgres::TestPg;
+pub use postgres::{TestPg, TestPgBuilder};

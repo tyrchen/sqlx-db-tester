@@ -12,10 +12,67 @@ use uuid::Uuid;
 pub struct TestPg {
     pub server_url: String,
     pub dbname: String,
+    #[allow(dead_code)]
+    extensions: Vec<String>,
+}
+
+/// Builder for creating a TestPg instance with custom configuration.
+pub struct TestPgBuilder<S>
+where
+    S: MigrationSource<'static> + Send + Sync + 'static,
+{
+    database_url: String,
+    migrations: S,
+    extensions: Vec<String>,
+}
+
+impl<S> TestPgBuilder<S>
+where
+    S: MigrationSource<'static> + Send + Sync + 'static,
+{
+    /// Create a new TestPgBuilder with the given database URL and migrations.
+    pub fn new(database_url: String, migrations: S) -> Self {
+        Self {
+            database_url,
+            migrations,
+            extensions: vec![],
+        }
+    }
+
+    /// Add a list of PostgreSQL extensions to be installed before running migrations.
+    ///
+    /// # Example
+    /// ```no_run
+    /// use sqlx_db_tester::TestPgBuilder;
+    /// use std::path::Path;
+    ///
+    /// let tdb = TestPgBuilder::new(
+    ///     "postgres://postgres:postgres@localhost:5432".to_string(),
+    ///     Path::new("./fixtures/migrations")
+    /// )
+    /// .with_extensions(vec!["uuid-ossp".to_string(), "postgis".to_string()])
+    /// .build();
+    /// ```
+    pub fn with_extensions(mut self, extensions: Vec<String>) -> Self {
+        self.extensions = extensions;
+        self
+    }
+
+    /// Build and initialize the test database with the configured settings.
+    pub fn build(self) -> TestPg {
+        TestPg::new_with_extensions(self.database_url, self.migrations, self.extensions)
+    }
 }
 
 impl TestPg {
     pub fn new<S>(database_url: String, migrations: S) -> Self
+    where
+        S: MigrationSource<'static> + Send + Sync + 'static,
+    {
+        Self::new_with_extensions(database_url, migrations, vec![])
+    }
+
+    fn new_with_extensions<S>(database_url: String, migrations: S, extensions: Vec<String>) -> Self
     where
         S: MigrationSource<'static> + Send + Sync + 'static,
     {
@@ -26,8 +83,13 @@ impl TestPg {
             None => format!("test_{simple}"),
         };
         let dbname_cloned = dbname.clone();
+        let extensions_cloned = extensions.clone();
 
-        let tdb = Self { server_url, dbname };
+        let tdb = Self {
+            server_url,
+            dbname,
+            extensions,
+        };
 
         let url = tdb.url();
 
@@ -47,6 +109,14 @@ impl TestPg {
                 let mut conn = PgConnection::connect(&url)
                     .await
                     .unwrap_or_else(|_| panic!("Error while connecting to {}", &url));
+
+                // create extensions before running migrations
+                for ext in &extensions_cloned {
+                    conn.execute(format!(r#"CREATE EXTENSION IF NOT EXISTS "{ext}""#).as_str())
+                        .await
+                        .unwrap_or_else(|_| panic!("Error while creating extension {ext}"));
+                }
+
                 let m = Migrator::new(migrations).await.unwrap();
                 m.run(&mut conn).await.unwrap();
             });
@@ -213,6 +283,28 @@ mod tests {
         Ok(())
     }
     use super::*;
+
+    #[tokio::test]
+    async fn test_postgres_with_extensions() {
+        use crate::TestPgBuilder;
+
+        let tdb = TestPgBuilder::new(
+            "postgres://postgres:postgres@localhost:5432".to_string(),
+            Path::new("./fixtures/migrations"),
+        )
+        .with_extensions(vec!["uuid-ossp".to_string()])
+        .build();
+
+        let pool = tdb.get_pool().await;
+
+        // Verify the extension is installed by trying to use it
+        let result = sqlx::query_scalar::<_, String>("SELECT uuid_generate_v4()::text")
+            .fetch_one(&pool)
+            .await;
+
+        assert!(result.is_ok(), "uuid-ossp extension should be available");
+    }
+
     #[test]
     fn test_with_dbname() {
         let url = "postgres://testuser:1@localhost/pureya";
