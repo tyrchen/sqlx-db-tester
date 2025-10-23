@@ -4,7 +4,11 @@ use sqlx::{
     Connection, Executor, PgConnection, PgPool,
     migrate::{MigrationSource, Migrator},
 };
-use std::{path::Path, thread};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+    thread,
+};
 use tokio::runtime::Runtime;
 use uuid::Uuid;
 
@@ -24,6 +28,7 @@ where
     database_url: String,
     migrations: S,
     extensions: Vec<String>,
+    seeds_path: Option<PathBuf>,
 }
 
 impl<S> TestPgBuilder<S>
@@ -36,6 +41,7 @@ where
             database_url,
             migrations,
             extensions: vec![],
+            seeds_path: None,
         }
     }
 
@@ -58,9 +64,37 @@ where
         self
     }
 
+    /// Add a path to a directory containing seed SQL files.
+    ///
+    /// Seed files should be named with the pattern `<timestamp>_<description>.sql`
+    /// (e.g., `20240101120000_initial_data.sql`). They will be executed in
+    /// timestamp order after migrations are complete.
+    ///
+    /// # Example
+    /// ```no_run
+    /// use sqlx_db_tester::TestPgBuilder;
+    /// use std::path::Path;
+    ///
+    /// let tdb = TestPgBuilder::new(
+    ///     "postgres://postgres:postgres@localhost:5432".to_string(),
+    ///     Path::new("./fixtures/migrations")
+    /// )
+    /// .with_seeds(Path::new("./fixtures/seeds"))
+    /// .build();
+    /// ```
+    pub fn with_seeds<P: AsRef<Path>>(mut self, seeds_path: P) -> Self {
+        self.seeds_path = Some(seeds_path.as_ref().to_path_buf());
+        self
+    }
+
     /// Build and initialize the test database with the configured settings.
     pub fn build(self) -> TestPg {
-        TestPg::new_with_extensions(self.database_url, self.migrations, self.extensions)
+        TestPg::new_with_config(
+            self.database_url,
+            self.migrations,
+            self.extensions,
+            self.seeds_path,
+        )
     }
 }
 
@@ -69,10 +103,23 @@ impl TestPg {
     where
         S: MigrationSource<'static> + Send + Sync + 'static,
     {
-        Self::new_with_extensions(database_url, migrations, vec![])
+        Self::new_with_config(database_url, migrations, vec![], None)
     }
 
+    #[allow(dead_code)]
     fn new_with_extensions<S>(database_url: String, migrations: S, extensions: Vec<String>) -> Self
+    where
+        S: MigrationSource<'static> + Send + Sync + 'static,
+    {
+        Self::new_with_config(database_url, migrations, extensions, None)
+    }
+
+    fn new_with_config<S>(
+        database_url: String,
+        migrations: S,
+        extensions: Vec<String>,
+        seeds_path: Option<PathBuf>,
+    ) -> Self
     where
         S: MigrationSource<'static> + Send + Sync + 'static,
     {
@@ -119,6 +166,11 @@ impl TestPg {
 
                 let m = Migrator::new(migrations).await.unwrap();
                 m.run(&mut conn).await.unwrap();
+
+                // run seed files if provided
+                if let Some(seeds_dir) = seeds_path {
+                    run_seeds(&mut conn, &seeds_dir).await.unwrap();
+                }
             });
         })
         .join()
@@ -209,6 +261,45 @@ impl Default for TestPg {
             Path::new("./fixtures/migrations"),
         )
     }
+}
+
+/// Discovers and runs seed SQL files from a directory.
+///
+/// Seed files should follow the naming pattern: `<timestamp>_<description>.sql`
+/// They will be executed in timestamp order.
+async fn run_seeds(conn: &mut PgConnection, seeds_dir: &Path) -> Result<()> {
+    if !seeds_dir.exists() {
+        return Ok(());
+    }
+
+    let mut seed_files = Vec::new();
+
+    // read all .sql files from the seeds directory
+    for entry in fs::read_dir(seeds_dir)? {
+        let entry = entry?;
+        let path = entry.path();
+
+        if path.is_file()
+            && path.extension().is_some_and(|ext| ext == "sql")
+            && let Some(filename) = path.file_name().and_then(|n| n.to_str())
+        {
+            // extract timestamp from filename (before first underscore)
+            if let Some(timestamp) = filename.split('_').next() {
+                seed_files.push((timestamp.to_string(), path));
+            }
+        }
+    }
+
+    // sort by timestamp
+    seed_files.sort_by(|a, b| a.0.cmp(&b.0));
+
+    // execute each seed file
+    for (_timestamp, path) in seed_files {
+        let sql = fs::read_to_string(&path)?;
+        conn.execute(sql.as_str()).await?;
+    }
+
+    Ok(())
 }
 
 fn parse_postgres_url(url: &str) -> (String, Option<String>) {
@@ -319,5 +410,30 @@ mod tests {
         let (server_url, dbname) = parse_postgres_url(url);
         assert_eq!(server_url, "postgres://testuser:1@localhost");
         assert_eq!(dbname, None);
+    }
+
+    #[tokio::test]
+    async fn test_postgres_with_seeds() {
+        use crate::TestPgBuilder;
+
+        let tdb = TestPgBuilder::new(
+            "postgres://postgres:postgres@localhost:5432".to_string(),
+            Path::new("./fixtures/migrations"),
+        )
+        .with_seeds(Path::new("./fixtures/seeds"))
+        .build();
+
+        let pool = tdb.get_pool().await;
+
+        // Verify that seed data was loaded in the correct order
+        let todos = sqlx::query_as::<_, (i32, String)>("SELECT id, title FROM todos ORDER BY id")
+            .fetch_all(&pool)
+            .await
+            .unwrap();
+
+        assert_eq!(todos.len(), 3);
+        assert_eq!(todos[0].1, "First seeded todo");
+        assert_eq!(todos[1].1, "Second seeded todo");
+        assert_eq!(todos[2].1, "Third seeded todo");
     }
 }
