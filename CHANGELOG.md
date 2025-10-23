@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 ---
+## [0.7.1](https://github.com/tyrchen/sqlx-db-tester/compare/v0.7.0..v0.7.1) - 2025-10-23
+
+### Features
+
+- support loading seed data for test - ([434d34f](https://github.com/tyrchen/sqlx-db-tester/commit/434d34feeb6c77fd6bf39bb7b109217dec05e917)) - Tyr Chen
+
+### Other
+
+- Update CHANGELOG.md - ([c7050da](https://github.com/tyrchen/sqlx-db-tester/commit/c7050da94c07fa01cc68f802b672a5452e9288fe)) - Tyr Chen
+
+---
 ## [0.7.0](https://github.com/tyrchen/sqlx-db-tester/compare/v0.6.4..v0.7.0) - 2025-10-22
 
 ### Features
