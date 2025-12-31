@@ -19,9 +19,9 @@ postgres = ["sqlx/postgres"]
 mysql = ["sqlx/mysql"]
 
 [dependencies]
-anyhow = "1"
-csv = "1.4"
-itertools = "0.14"
+anyhow = "1.0.100"
+csv = "1.4.0"
+itertools = "0.14.0"
 sqlx = { version = "0.8", features = ["runtime-tokio-rustls"] }
-tokio = { version = "1.48", features = ["macros", "rt", "rt-multi-thread"] }
-uuid = { version = "1.18", features = ["v4"] }
+tokio = { version = "1.48.0", features = ["macros", "rt", "rt-multi-thread"] }
+uuid = { version = "1.19.0", features = ["v4"] }
